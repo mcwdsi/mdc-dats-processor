@@ -7,14 +7,17 @@ def parse_authors(jsn):
     author_list = []
     s = ", "
 
-    for i in jsn["creators"]:
-        last = i["lastName"]
-        first = i["firstName"]
+    try:
+        for i in jsn["creators"]:
+            last = i["lastName"]
+            first = i["firstName"]
 
-        str = first + " " + last
-        author_list.append(str)
+            str = first + " " + last
+            author_list.append(str)
 
-        continue
+            continue
+    except:
+        author_list.append("null")
 
     authors = s.join(author_list)
 
@@ -24,18 +27,37 @@ def parse_authors(jsn):
 def parse_dates(jsn):
     dates = dict()
 
-    for element in jsn["distributions"]:
-        for i in element["dates"]:
-            if "creation" not in i["type"]["value"]:
-                value = i["type"]["value"]
-                value += "Date"
-                dates[value] = i["date"]
-            else:
-                dates["creationDate"] = i["date"]
-                dates["modificationDate"] = "null"
+    try:
+        for element in jsn["distributions"]:
+            if not element["dates"]:
+                dates["creationDate"] = "null"
                 dates["curationDate"] = "null"
+                dates["modificationDate"] = "null"
+                dates["accessedDate"] = "null"
+            else:
+                date_lst = []
+                for i in element["dates"]:
+                    date_lst.append(i["type"]["value"])
 
-            continue
+                    value = i["type"]["value"]
+                    value += "Date"
+                    dates[value] = i["date"]
+
+                    if "creation" not in date_lst:
+                        dates["creationDate"] = "null"
+                    if "modification" not in date_lst:
+                        dates["modificationDate"] = "null"
+                    if "curation" not in date_lst:
+                        dates["curationDate"] = "null"
+                    if "accessed" not in date_lst:
+                        dates["accessedDate"] = "null"
+
+                    continue
+    except:
+        dates["creationDate"] = "null"
+        dates["curationDate"] = "null"
+        dates["modificationDate"] = "null"
+        dates["accessedDate"] = "null"
 
     return dates
 
@@ -49,6 +71,15 @@ def parse_format(jsn):
         formats = "null"
 
     return formats
+
+
+def parse_standard(jsn):
+    try:
+        standard = jsn["distributions"][0]["conformsTo"][0]["name"]
+    except:
+        standard = "null"
+
+    return standard
 
 
 def parse_landing_page(jsn):
@@ -193,31 +224,32 @@ def parse_disease_name(jsn):
 def parse_json(fhand):
     dataset_info = dict()
 
-    #dataset_info["title"] = fhand["title"]
-    #dataset_info["datasetIdentifier"] = parse_dataset_id(fhand)
-    #dataset_info["authors"] = parse_authors(fhand)
-    #dataset_info["created"] = parse_dates(fhand).get("creationDate")
-    #dataset_info["modified"] = parse_dates(fhand).get("modificationDate")
-    #dataset_info["curated"] = parse_dates(fhand).get("curationDate")
-    #dataset_info["landingPage"] = parse_landing_page(fhand)
-    #dataset_info["accessPage"] = parse_access_page(fhand)
-    #dataset_info["format"] = parse_format(fhand)
-    #dataset_info["conformsTo"] = fhand["distributions"][0]["conformsTo"][0]["name"]
-    #dataset_info["geography"] = parse_geo(fhand)
-    #dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
-    #dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
-    #dataset_info["ISO_3166-1"] = parse_iso_codes(fhand).get("ISO_3166-1")
-    #dataset_info["ISO_3166-1_alpha-3"] = parse_iso_codes(fhand).get("ISO_3166-1_alpha-3")
-    #dataset_info["disease"] = parse_disease_name(fhand)
+    dataset_info["title"] = fhand["title"]
+    dataset_info["datasetIdentifier"] = parse_dataset_id(fhand)
+    dataset_info["authors"] = parse_authors(fhand)
+    dataset_info["created"] = parse_dates(fhand).get("creationDate")
+    dataset_info["modified"] = parse_dates(fhand).get("modificationDate")
+    dataset_info["curated"] = parse_dates(fhand).get("curationDate")
+    dataset_info["accessed"] = parse_dates(fhand).get("accessedDate")
+    dataset_info["landingPage"] = parse_landing_page(fhand)
+    dataset_info["accessPage"] = parse_access_page(fhand)
+    dataset_info["format"] = parse_format(fhand)
+    dataset_info["conformsTo"] = parse_standard(fhand)
+    dataset_info["geography"] = parse_geo(fhand)
+    dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
+    dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
+    dataset_info["ISO_3166-1"] = parse_iso_codes(fhand).get("ISO_3166-1")
+    dataset_info["ISO_3166-1_alpha-3"] = parse_iso_codes(fhand).get("ISO_3166-1_alpha-3")
+    dataset_info["disease"] = parse_disease_name(fhand)
 
-    dataset_info["identifier"] = parse_nested_attr(fhand, "identifier", "identifier")
-    dataset_info["identifier_source"] = parse_nested_attr(fhand, "identifier", "identifierSource")
-    dataset_info["name"] = fhand["name"]
-    dataset_info["type"] = parse_nested_attr(fhand, "type", "value")
-    dataset_info["type_IRI"] = parse_nested_attr(fhand, "type", "valueIRI")
-    dataset_info["description"] = fhand["description"]
-    dataset_info["licenses"] = fhand["licenses"][0]["name"]
-    dataset_info["version"] = fhand["version"]
+    #dataset_info["identifier"] = parse_nested_attr(fhand, "identifier", "identifier")
+    #dataset_info["identifier_source"] = parse_nested_attr(fhand, "identifier", "identifierSource")
+    #dataset_info["name"] = fhand["name"]
+    #dataset_info["type"] = parse_nested_attr(fhand, "type", "value")
+    #dataset_info["type_IRI"] = parse_nested_attr(fhand, "type", "valueIRI")
+    #dataset_info["description"] = fhand["description"]
+    #dataset_info["licenses"] = fhand["licenses"][0]["name"]
+    #dataset_info["version"] = fhand["version"]
 
     return dataset_info
 
@@ -240,12 +272,12 @@ if __name__ == '__main__':
 
 
     with open(output_fname, "a") as dats_f:
-        #fieldnames = \
-        #    ['title', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'curated', 'landingPage',
-        #    'accessPage', 'format', 'conformsTo', 'geography', 'apolloLocationCode', 'ISO_3166', 'ISO_3166-1',
-        #     'ISO_3166-1_alpha-3']
+        fieldnames = \
+            ['title', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'curated', 'accessed',
+             'landingPage', 'accessPage', 'format', 'conformsTo', 'geography', 'apolloLocationCode', 'ISO_3166',
+             'ISO_3166-1', 'ISO_3166-1_alpha-3']
 
-        fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses', 'version']
+        #fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses', 'version']
 
         dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
         dict_writer.writeheader()
