@@ -1,6 +1,7 @@
 import os
 import json
 from csv import DictWriter
+import datetime as dt
 
 
 def parse_authors(jsn):
@@ -31,7 +32,6 @@ def parse_dates(jsn):
         for element in jsn["distributions"]:
             if not element["dates"]:
                 dates["creationDate"] = "null"
-                dates["curationDate"] = "null"
                 dates["modificationDate"] = "null"
                 dates["accessedDate"] = "null"
             else:
@@ -47,15 +47,12 @@ def parse_dates(jsn):
                         dates["creationDate"] = "null"
                     if "modification" not in date_lst:
                         dates["modificationDate"] = "null"
-                    if "curation" not in date_lst:
-                        dates["curationDate"] = "null"
                     if "accessed" not in date_lst:
                         dates["accessedDate"] = "null"
 
                     continue
     except:
         dates["creationDate"] = "null"
-        dates["curationDate"] = "null"
         dates["modificationDate"] = "null"
         dates["accessedDate"] = "null"
 
@@ -98,6 +95,7 @@ def parse_access_page(jsn):
         url = "null"
 
     return url
+
 
 def parse_dataset_id(jsn):
     if jsn["identifier"]["identifier"] == "":
@@ -221,42 +219,94 @@ def parse_disease_name(jsn):
         return disease_name
 
 
+def parse_extra(jsn):
+    extra_properties = dict()
+    categories = []
+
+    for property in jsn["extraProperties"]:
+        categories.append(property["category"])
+
+        if "human" in property["category"]:
+            if not property["values"][0]["value"]:
+                extra_properties["human_value"] = "null"
+            else:
+                extra_properties["human_value"] = property["values"][0]["value"]
+
+            if not property["values"][0]["valueIRI"]:
+                extra_properties["human_value_IRI"] = "null"
+            else:
+                extra_properties["human_value_IRI"] = property["values"][0]["valueIRI"]
+
+
+        if "machine" in property["category"]:
+            if not property["values"][0]["value"]:
+                extra_properties["machine_value"] = "null"
+            else:
+                extra_properties["machine_value"] = property["values"][0]["value"]
+
+            if not property["values"][0]["valueIRI"]:
+                extra_properties["machine_value_IRI"] = "null"
+            else:
+                extra_properties["machine_value_IRI"] = property["values"][0]["valueIRI"]
+
+
+    if "human-readable specification of data format" not in categories:
+        extra_properties["human_value"] = "null"
+        extra_properties["human_value_IRI"] = "null"
+
+
+    if "machine-readable specification of data format" not in categories:
+        extra_properties["machine_value"] = "null"
+        extra_properties["machine_value_IRI"] = "null"
+
+
+    return extra_properties
+
+
 def parse_json(fhand):
     dataset_info = dict()
 
-    dataset_info["title"] = fhand["title"]
-    dataset_info["datasetIdentifier"] = parse_dataset_id(fhand)
-    dataset_info["authors"] = parse_authors(fhand)
-    dataset_info["created"] = parse_dates(fhand).get("creationDate")
-    dataset_info["modified"] = parse_dates(fhand).get("modificationDate")
-    dataset_info["curated"] = parse_dates(fhand).get("curationDate")
-    dataset_info["accessed"] = parse_dates(fhand).get("accessedDate")
-    dataset_info["landingPage"] = parse_landing_page(fhand)
-    dataset_info["accessPage"] = parse_access_page(fhand)
-    dataset_info["format"] = parse_format(fhand)
-    dataset_info["conformsTo"] = parse_standard(fhand)
-    dataset_info["geography"] = parse_geo(fhand)
-    dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
-    dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
-    dataset_info["ISO_3166-1"] = parse_iso_codes(fhand).get("ISO_3166-1")
-    dataset_info["ISO_3166-1_alpha-3"] = parse_iso_codes(fhand).get("ISO_3166-1_alpha-3")
-    dataset_info["disease"] = parse_disease_name(fhand)
-
-    #dataset_info["identifier"] = parse_nested_attr(fhand, "identifier", "identifier")
-    #dataset_info["identifier_source"] = parse_nested_attr(fhand, "identifier", "identifierSource")
-    #dataset_info["name"] = fhand["name"]
-    #dataset_info["type"] = parse_nested_attr(fhand, "type", "value")
-    #dataset_info["type_IRI"] = parse_nested_attr(fhand, "type", "valueIRI")
-    #dataset_info["description"] = fhand["description"]
-    #dataset_info["licenses"] = fhand["licenses"][0]["name"]
-    #dataset_info["version"] = fhand["version"]
+    try:
+        dataset_info["title"] = fhand["title"]
+        dataset_info["datasetIdentifier"] = parse_dataset_id(fhand)
+        dataset_info["authors"] = parse_authors(fhand)
+        dataset_info["created"] = parse_dates(fhand).get("creationDate")
+        dataset_info["modified"] = parse_dates(fhand).get("modificationDate")
+        dataset_info["accessed"] = parse_dates(fhand).get("accessedDate")
+        dataset_info["landingPage"] = parse_landing_page(fhand)
+        dataset_info["accessPage"] = parse_access_page(fhand)
+        dataset_info["format"] = parse_format(fhand)
+        dataset_info["conformsTo"] = parse_standard(fhand)
+        dataset_info["geography"] = parse_geo(fhand)
+        dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
+        dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
+        dataset_info["ISO_3166-1"] = parse_iso_codes(fhand).get("ISO_3166-1")
+        dataset_info["ISO_3166-1_alpha-3"] = parse_iso_codes(fhand).get("ISO_3166-1_alpha-3")
+        dataset_info["disease"] = parse_disease_name(fhand)
+    except:
+        dataset_info["identifier"] = parse_nested_attr(fhand, "identifier", "identifier")
+        dataset_info["identifier_source"] = parse_nested_attr(fhand, "identifier", "identifierSource")
+        dataset_info["name"] = fhand["name"]
+        dataset_info["type"] = parse_nested_attr(fhand, "type", "value")
+        dataset_info["type_IRI"] = parse_nested_attr(fhand, "type", "valueIRI")
+        dataset_info["description"] = fhand["description"]
+        dataset_info["licenses"] = fhand["licenses"][0]["name"]
+        dataset_info["version"] = fhand["version"]
+        dataset_info["human-readable_data_format_specification_value"] = parse_extra(fhand).get("human_value")
+        dataset_info["human-readable_data_format_specification_value_IRI"] = parse_extra(fhand).get("human_value_IRI")
+        dataset_info["machine-readable_data_format_specification_value"] = parse_extra(fhand).get("machine_value")
+        dataset_info["machine-readable_data_format_specification_value_IRI"] = parse_extra(fhand).get("machine_value_IRI")
 
     return dataset_info
 
 
 if __name__ == '__main__':
     dhand = input("Please enter name of directory with JSON files: ")
-    output_fname = input("Please enter the desired name for the output file: ") + ".txt"
+    output_fname = dhand.replace("json", "info_")
+
+    today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
+    output_fname += today
+    output_fname += ".txt"
 
     dsets_dicts = []
 
@@ -271,16 +321,35 @@ if __name__ == '__main__':
             jsn_data.close()
 
 
-    with open(output_fname, "a") as dats_f:
-        fieldnames = \
-            ['title', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'curated', 'accessed',
-             'landingPage', 'accessPage', 'format', 'conformsTo', 'geography', 'apolloLocationCode', 'ISO_3166',
-             'ISO_3166-1', 'ISO_3166-1_alpha-3']
+    try:
+        for dset_dict in dsets_dicts:
+            x = dset_dict["title"]
 
-        #fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses', 'version']
+        with open(output_fname, "a") as dats_f:
+            fieldnames = \
+                ['title', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
+                 'landingPage', 'accessPage', 'format', 'conformsTo', 'geography', 'apolloLocationCode', 'ISO_3166',
+                 'ISO_3166-1', 'ISO_3166-1_alpha-3']
 
-        dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
-        dict_writer.writeheader()
+            dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
+            dict_writer.writeheader()
 
-        for dset in dsets_dicts:
-            dict_writer.writerow(dset)
+            for dset in dsets_dicts:
+                dict_writer.writerow(dset)
+    except:
+        for dset_dict in dsets_dicts:
+            x = dset_dict["name"]
+
+        with open(output_fname, "a") as dats_f:
+
+            fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses',
+                          'version', 'human-readable_data_format_specification_value',
+                          'human-readable_data_format_specification_value_IRI',
+                          'machine-readable_data_format_specification_value',
+                          'machine-readable_data_format_specification_value_IRI']
+
+            dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
+            dict_writer.writeheader()
+
+            for dset in dsets_dicts:
+                dict_writer.writerow(dset)
