@@ -8,7 +8,9 @@ def parse_authors(jsn):
     author_list = []
     s = ", "
 
-    try:
+    if not jsn["creators"]:
+        author_list.append("null")
+    else:
         for i in jsn["creators"]:
             last = i["lastName"]
             first = i["firstName"]
@@ -16,9 +18,6 @@ def parse_authors(jsn):
             str = first + " " + last
             author_list.append(str)
 
-            continue
-    except:
-        author_list.append("null")
 
     authors = s.join(author_list)
 
@@ -219,6 +218,25 @@ def parse_disease_name(jsn):
         return disease_name
 
 
+def parse_licenses(jsn):
+    for license in jsn["licenses"]:
+        if not license["name"]:
+            license_name = "null"
+        else:
+            license_name = license["name"]
+
+        return license_name
+
+
+def parse_version(jsn):
+    if not jsn["version"]:
+        license = "null"
+    else:
+        license = jsn["version"]
+
+    return license
+
+
 def parse_extra(jsn):
     extra_properties = dict()
     categories = []
@@ -290,8 +308,8 @@ def parse_json(fhand):
         dataset_info["type"] = parse_nested_attr(fhand, "type", "value")
         dataset_info["type_IRI"] = parse_nested_attr(fhand, "type", "valueIRI")
         dataset_info["description"] = fhand["description"]
-        dataset_info["licenses"] = fhand["licenses"][0]["name"]
-        dataset_info["version"] = fhand["version"]
+        dataset_info["licenses"] = parse_licenses(fhand)
+        dataset_info["version"] = parse_version(fhand)
         dataset_info["human-readable_data_format_specification_value"] = parse_extra(fhand).get("human_value")
         dataset_info["human-readable_data_format_specification_value_IRI"] = parse_extra(fhand).get("human_value_IRI")
         dataset_info["machine-readable_data_format_specification_value"] = parse_extra(fhand).get("machine_value")
