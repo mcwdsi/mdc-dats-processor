@@ -77,6 +77,18 @@ def parse_standard(jsn):
 
     return standard
 
+def parse_dataset_licenses(jsn):
+    try:
+        licenses = jsn["distributions"][0]["storedIn"]["licenses"]
+        licenseName = ''
+        for license in licenses:
+            licenseName += license["name"] + ","
+
+    except:
+        licenseName = "null"
+
+    return licenseName
+
 
 def parse_landing_page(jsn):
     try:
@@ -222,13 +234,13 @@ def parse_disease_name(jsn):
 
 
 def parse_licenses(jsn):
-    for license in jsn["licenses"]:
-        if not license["name"]:
-            license_name = "null"
-        else:
-            license_name = license["name"]
+      for license in jsn["licenses"]:
+         if not license["name"]:
+             license_name = "null"
+         else:
+             license_name = license["name"]
 
-        return license_name
+         return license_name
 
 
 def parse_version(jsn):
@@ -299,7 +311,7 @@ def parse_json(fhand):
         dataset_info["accessPage"] = parse_access_page(fhand)
         dataset_info["format"] = parse_format(fhand)
         dataset_info["conformsTo"] = parse_standard(fhand)
-        dataset_info["license"] =
+        dataset_info["license"] = parse_dataset_licenses(fhand)
         dataset_info["geography"] = parse_geo(fhand)
         dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
         dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
@@ -347,8 +359,10 @@ if __name__ == '__main__':
     try:
         for dset_dict in dsets_dicts:
             x = dset_dict["title"]
-
-        with open(output_fname, "a") as dats_f:
+ 
+        mode = 'a' if os.path.exists(output_fname) else 'w'
+        
+        with open(output_fname, mode) as dats_f:
             fieldnames = \
                 ['title', 'description', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
                  'landingPage', 'accessPage', 'format', 'conformsTo', 'license', 'geography', 'apolloLocationCode', 'ISO_3166',
@@ -363,7 +377,10 @@ if __name__ == '__main__':
         for dset_dict in dsets_dicts:
             x = dset_dict["name"]
 
-        with open(output_fname, "a") as dats_f:
+        print(output_fname)
+        mode = 'a' if os.path.exists(output_fname) else 'w'
+        print(mode)
+        with open(output_fname, mode) as dats_f:
 
             fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses',
                           'version', 'human-readable_data_format_specification_value',
