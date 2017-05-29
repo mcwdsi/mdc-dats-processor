@@ -97,10 +97,13 @@ def parse_access_page(jsn):
 
 
 def parse_dataset_id(jsn):
-    if jsn["identifier"]["identifier"] == "":
+    try:
+        if jsn["identifier"]["identifier"] == "":
+            id = "null"
+        else:
+            id = jsn["identifier"]["identifier"]
+    except:
         id = "null"
-    else:
-        id = jsn["identifier"]["identifier"]
 
     return id
 
@@ -286,6 +289,7 @@ def parse_json(fhand):
 
     try:
         dataset_info["title"] = fhand["title"]
+        dataset_info["description"] = fhand["description"]
         dataset_info["datasetIdentifier"] = parse_dataset_id(fhand)
         dataset_info["authors"] = parse_authors(fhand)
         dataset_info["created"] = parse_dates(fhand).get("creationDate")
@@ -295,6 +299,7 @@ def parse_json(fhand):
         dataset_info["accessPage"] = parse_access_page(fhand)
         dataset_info["format"] = parse_format(fhand)
         dataset_info["conformsTo"] = parse_standard(fhand)
+        dataset_info["license"] =
         dataset_info["geography"] = parse_geo(fhand)
         dataset_info["apolloLocationCode"] = parse_geo_id(fhand)
         dataset_info["ISO_3166"] = parse_iso_codes(fhand).get("ISO_3166")
@@ -345,8 +350,8 @@ if __name__ == '__main__':
 
         with open(output_fname, "a") as dats_f:
             fieldnames = \
-                ['title', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
-                 'landingPage', 'accessPage', 'format', 'conformsTo', 'geography', 'apolloLocationCode', 'ISO_3166',
+                ['title', 'description', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
+                 'landingPage', 'accessPage', 'format', 'conformsTo', 'license', 'geography', 'apolloLocationCode', 'ISO_3166',
                  'ISO_3166-1', 'ISO_3166-1_alpha-3']
 
             dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
