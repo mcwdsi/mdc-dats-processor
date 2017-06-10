@@ -337,7 +337,7 @@ def parse_json(fhand):
 
 if __name__ == '__main__':
     dhand = input("Please enter name of directory with JSON files: ")
-    output_fname = dhand + "info_"
+    output_fname = dhand + "_info_"
 
     today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
     output_fname += today
