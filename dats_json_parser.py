@@ -337,62 +337,72 @@ def parse_json(fhand):
 
 if __name__ == '__main__':
     dhand = input("Please enter name of directory with JSON files: ")
-    output_fname = dhand + "_info_"
+    
+    for subdir in os.listdir(dhand):
+        subdirAbs = dhand + "/" + subdir
 
-    today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
-    output_fname += today
-    output_fname += ".txt"
+        print("subdirAbs=" + subdirAbs)
 
-    dsets_dicts = []
+        output_fname = subdirAbs + "_info_"
 
-    for filename in os.listdir(dhand):
-        filename = dhand + "/" + filename
+        today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
+        output_fname += today
+        output_fname += ".txt"
 
-        if (os.path.isdir(filename)):
-            continue
+        print (output_fname)
 
-        with open(filename) as jsn_data:
-            hand = json.load(jsn_data)
+        dsets_dicts = []
 
-            dsets_dicts.append(parse_json(hand))
+        for filename in os.listdir(subdirAbs):
+            filename = subdirAbs + "/" + filename
 
-            jsn_data.close()
+            if (os.path.isdir(filename)):
+                continue
+
+            with open(filename) as jsn_data:
+                hand = json.load(jsn_data)
+
+                dsets_dicts.append(parse_json(hand))
+
+                jsn_data.close()
 
 
-    try:
-        for dset_dict in dsets_dicts:
-            x = dset_dict["title"]
+        try:
+            for dset_dict in dsets_dicts:
+                x = dset_dict["title"]
  
-        mode = 'a' if os.path.exists(output_fname) else 'w'
+            mode = 'a' if os.path.exists(output_fname) else 'w'
         
-        with open(output_fname, mode) as dats_f:
-            fieldnames = \
-                ['title', 'description', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
-                 'landingPage', 'accessPage', 'format', 'conformsTo', 'license', 'geography', 'apolloLocationCode', 'ISO_3166',
-                 'ISO_3166-1', 'ISO_3166-1_alpha-3']
+            with open(output_fname, mode) as dats_f:
+                fieldnames = \
+                       ['title', 'description', 'datasetIdentifier', 'disease', 'authors', 'created', 'modified', 'accessed',
+                        'landingPage', 'accessPage', 'format', 'conformsTo', 'license', 'geography', 'apolloLocationCode', 'ISO_3166',
+                        'ISO_3166-1', 'ISO_3166-1_alpha-3']
 
-            dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
-            dict_writer.writeheader()
+                dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
+                dict_writer.writeheader()
 
-            for dset in dsets_dicts:
-                dict_writer.writerow(dset)
-    except:
-        for dset_dict in dsets_dicts:
-            x = dset_dict["name"]
+                for dset in dsets_dicts:
+                    dict_writer.writerow(dset)
 
-        print(output_fname)
-        mode = 'a' if os.path.exists(output_fname) else 'w'
-        print(mode)
-        with open(output_fname, mode) as dats_f:
+        except:
+            for dset_dict in dsets_dicts:
+                x = dset_dict["name"]
 
-            fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses',
-                          'version', 'human-readable_data_format_specification_value',
-                          'human-readable_data_format_specification_value_IRI',
-                          'machine-readable_data_format_specification_value',
-                          'machine-readable_data_format_specification_value_IRI']
+            print(output_fname)
+            mode = 'a' if os.path.exists(output_fname) else 'w'
+            print(mode)
+            with open(output_fname, mode) as dats_f:
 
-            dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
-            dict_writer.writeheader()
+                fieldnames = ['name', 'identifier', 'identifier_source', 'type', 'type_IRI', 'description', 'licenses',
+                              'version', 'human-readable_data_format_specification_value',
+                              'human-readable_data_format_specification_value_IRI',
+                              'machine-readable_data_format_specification_value',
+                              'machine-readable_data_format_specification_value_IRI']
 
-            for dset in dsets_dicts:
-                dict_writer.writerow(dset)
+                dict_writer = DictWriter(dats_f, fieldnames=fieldnames, delimiter="\t")
+                dict_writer.writeheader()
+
+                for dset in dsets_dicts:
+                    dict_writer.writerow(dset)
+
