@@ -337,7 +337,7 @@ def parse_json(fhand):
 
 if __name__ == '__main__':
     dhand = input("Please enter name of directory with JSON files: ")
-    output_fname = dhand.replace("json", "info_")
+    output_fname = dhand + "info_"
 
     today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
     output_fname += today
@@ -347,6 +347,9 @@ if __name__ == '__main__':
 
     for filename in os.listdir(dhand):
         filename = dhand + "/" + filename
+
+        if (os.path.isdir(filename)):
+            continue
 
         with open(filename) as jsn_data:
             hand = json.load(jsn_data)
