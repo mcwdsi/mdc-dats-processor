@@ -341,15 +341,11 @@ if __name__ == '__main__':
     for subdir in os.listdir(dhand):
         subdirAbs = dhand + "/" + subdir
 
-        print("subdirAbs=" + subdirAbs)
-
         output_fname = subdirAbs + "_info_"
 
         today = dt.datetime.today().strftime("%Y-%m-%d_T%H-%M")
         output_fname += today
         output_fname += ".txt"
-
-        print (output_fname)
 
         dsets_dicts = []
 
