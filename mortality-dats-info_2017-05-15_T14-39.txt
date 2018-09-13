@@ -1,3 +1,0 @@
-title	datasetIdentifier	disease	authors	created	modified	curated	accessed	landingPage	accessPage	format	conformsTo	geography	apolloLocationCode	ISO_3166	ISO_3166-1	ISO_3166-1_alpha-3
-CDC WONDER US cause of death 1995-2015	CDC WONDER US cause of death 1995-2015	null	 US CDC	null	null	null	2017-05-11	https://wonder.cdc.gov/ucd-icd10.html	null	null	null	United States	1216	null	null	null
-CDC WONDER US compressed mortality data	CDC WONDER US cause of death 1968-2015	null	 US CDC	null	null	null	2017-05-11	https://wonder.cdc.gov/mortSQL.html	null	null	null	United States	1216	null	null	null
