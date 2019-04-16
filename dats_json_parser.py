@@ -749,19 +749,22 @@ if __name__ == "__main__":
         for element in data:
             if "Dataset" in element["type"]:
                 title = element["content"]["title"]
-                identifier = element["content"]["identifier"]["identifier"]
 
-                if identifier == "https://data.cdc.gov/api/views/ei7y-3g6s":
+                try:
+                    identifier = element["content"]["identifier"]["identifier"]
+                except:
                     disease_surveillance_dset_dicts.append(parse_datasets(element["content"]))
+                    continue
 
-                if identifier == "https://data.sfgov.org/api/views/yg87-cd6v" \
-                        or identifier == "https://data.kingcounty.gov/api/views/7pbe-yd3f" \
-                        or identifier == "https://data.cdc.gov/api/views/cjae-szjv" \
-                        or identifier == "https://data.cityofnewyork.us/api/views/w9ei-idxz" \
-                        or identifier == "https://data.cityofnewyork.us/api/views/kku6-nxdu":
+
+                if identifier == "http://data.sfgov.org/api/views/yg87-cd6v" \
+                        or identifier == "http://data.cdc.gov/api/views/cjae-szjv" \
+                        or identifier == "http://data.cityofnewyork.us/api/views/w9ei-idxz" \
+                        or identifier == "http://data.cityofnewyork.us/api/views/kku6-nxdu":
                     location_dset_dicts.append(parse_datasets(element["content"]))
+                    continue
 
-                if identifier == "https://doi.org/10.5281/zenodo.580104":
+                if identifier == "http://doi.org/10.5281/zenodo.580104":
                     ids_dset_dicts.append(parse_datasets(element["content"]))
 
                 if identifier == "MIDAS-ISG:WS-000487":
@@ -801,7 +804,11 @@ if __name__ == "__main__":
                         or identifier == "MIDAS-ISG:WS-000486" \
                         or identifier == "http://www2.datasus.gov.br/DATASUS/index.php?area=0203" \
                         or identifier == "MIDAS-ISG:WS-000023" \
-                        or identifier == "https://www.moh.gov.sg/content/moh_web/home/diseases_and_conditions.html":
+                        or identifier == "MIDAS-ISG:allegheny-count-ed-visits-pds-set1" \
+                        or identifier == "10.5281/zenodo.2583145" \
+                        or identifier == "10.5281/zenodo.2583143" \
+                        or identifier == "10.5281/zenodo.2583216" \
+                        or identifier == "https://www.moh.gov.sg/diseases-updates":
                     disease_surveillance_dset_dicts.append(parse_datasets(element["content"]))
 
                 try:
@@ -835,6 +842,9 @@ if __name__ == "__main__":
         write_to_file(web_dset_output_fname, web_dset_dicts, content_type)
         print("Writing output from Location dataset DATS to file...")
         write_to_file(location_dset_output_fname, location_dset_dicts, content_type)
+
+        for d in disease_surveillance_dset_dicts:
+            print(d)
 
         print("<-------------------- Number of resources parsed for each dataset category -------------------->")
         print("\t", "Tycho: ", len(tycho_dset_dicts))
