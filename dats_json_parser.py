@@ -313,11 +313,13 @@ def parse_disease_name(jsn):
 
 def parse_description(jsn):
     """Parses the description from the DATS and returns it as a string."""
-
-    description = jsn["description"]
-    cleaned_description = description.replace("\n", " ")
-    return cleaned_description
-
+    try:
+        description = jsn["description"]
+        cleaned_description = description.replace("\n", " ")
+        return cleaned_description
+    except KeyError:
+        cleaned_description = "null"
+        return cleaned_description
 
 def parse_licenses(jsn):
     """Parses the license name from the DATS and returns it as a string."""
@@ -752,7 +754,7 @@ if __name__ == "__main__":
 
                 try:
                     identifier = element["content"]["identifier"]["identifier"]
-                except:
+                except KeyError:
                     disease_surveillance_dset_dicts.append(parse_datasets(element["content"]))
                     continue
 
