@@ -18,7 +18,7 @@ if dir_name == "datasets":
             file_list = glob.glob(sub_dir)
             latest_f = max(file_list, key=os.path.getmtime)
 
-            with open(latest_f) as t_name:
+            with open(latest_f, encoding="latin-1") as t_name:
                 reader = csv.DictReader(t_name, dialect="excel-tab")
                 print("Pulling information from ", sub_dir, "...")
 

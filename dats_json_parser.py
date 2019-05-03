@@ -769,7 +769,7 @@ if __name__ == "__main__":
                 if identifier == "http://doi.org/10.5281/zenodo.580104":
                     ids_dset_dicts.append(parse_datasets(element["content"]))
 
-                if identifier == "MIDAS-ISG:WS-000487":
+                if identifier == "MDC:WS-000487":
                     mortality_dset_dicts.append(parse_datasets(element["content"]))
 
                 if "epidemic" in check_type(element["content"], "information") and "Chikungunya" in check_is_about(element["content"]):
@@ -800,16 +800,18 @@ if __name__ == "__main__":
                             synthia_dset_dicts.append(parse_datasets(element["content"]))
                 except KeyError : continue
 
-                if identifier == "MIDAS-ISG:WS-000494" \
+                if identifier == "MDC:WS-000494" \
                         or identifier == "https://data.cdc.gov/browse?category=MMWR" \
-                        or identifier == "MIDAS-ISG:WS-000484" \
-                        or identifier == "MIDAS-ISG:WS-000486" \
+                        or identifier == "MDC:WS-000484" \
+                        or identifier == "MDC:WS-000486" \
                         or identifier == "http://www2.datasus.gov.br/DATASUS/index.php?area=0203" \
-                        or identifier == "MIDAS-ISG:WS-000023" \
-                        or identifier == "MIDAS-ISG:allegheny-count-ed-visits-pds-set1" \
+                        or identifier == "MDC:WS-000023" \
+                        or identifier == "MDC:allegheny-count-ed-visits-pds-set1" \
                         or identifier == "10.5281/zenodo.2583145" \
                         or identifier == "10.5281/zenodo.2583143" \
                         or identifier == "10.5281/zenodo.2583216" \
+                        or identifier == "10.5281/zenodo.2644020" \
+                        or identifier == "10.5281/zenodo.2643814" \
                         or identifier == "https://www.moh.gov.sg/diseases-updates":
                     disease_surveillance_dset_dicts.append(parse_datasets(element["content"]))
 
@@ -821,32 +823,29 @@ if __name__ == "__main__":
                 except KeyError : continue
 
         print("Writing output from Project Tycho dataset DATS to file...")
-        write_to_file(tycho_output_fname, tycho_dset_dicts, content_type)
+        #write_to_file(tycho_output_fname, tycho_dset_dicts, content_type)
         print("Writing output from SPEW dataset DATS to file...")
-        write_to_file(spew_output_fname, spew_dset_dicts, content_type)
+        #write_to_file(spew_output_fname, spew_dset_dicts, content_type)
         print("Writing output from Synthia dataset DATS to file...")
-        write_to_file(synthia_output_fname, synthia_dset_dicts, content_type)
+        #write_to_file(synthia_output_fname, synthia_dset_dicts, content_type)
         print("Writing output from Case Series dataset DATS to file...")
-        write_to_file(case_series_output_fname, case_series_dset_dicts, content_type)
+        #write_to_file(case_series_output_fname, case_series_dset_dicts, content_type)
         print("Writing output from Chikungunya dataset DATS to file...")
-        write_to_file(chikv_output_fname, chikv_epidemic_dset_dicts, content_type)
+        #write_to_file(chikv_output_fname, chikv_epidemic_dset_dicts, content_type)
         print("Writing output from Ebola dataset DATS to file...")
-        write_to_file(ebov_output_fname, ebov_epidemic_dset_dicts, content_type)
+        #write_to_file(ebov_output_fname, ebov_epidemic_dset_dicts, content_type)
         print("Writing output from Zika dataset DATS to file...")
-        write_to_file(zikv_output_fname, zikv_epidemic_dset_dicts, content_type)
+        #write_to_file(zikv_output_fname, zikv_epidemic_dset_dicts, content_type)
         print("Writing output from Infectious Disease Scenario dataset DATS to file...")
-        write_to_file(ids_output_fname, ids_dset_dicts, content_type)
+        #write_to_file(ids_output_fname, ids_dset_dicts, content_type)
         print("Writing output from Mortality dataset DATS to file...")
         write_to_file(mortality_out_fname, mortality_dset_dicts, content_type)
         print("Writing output from Disease Surveillance dataset DATS to file...")
         write_to_file(disease_surveillance_output_fname, disease_surveillance_dset_dicts, content_type)
         print("Writing output from Websites with data DATS to file...")
-        write_to_file(web_dset_output_fname, web_dset_dicts, content_type)
+        #write_to_file(web_dset_output_fname, web_dset_dicts, content_type)
         print("Writing output from Location dataset DATS to file...")
-        write_to_file(location_dset_output_fname, location_dset_dicts, content_type)
-
-        for d in disease_surveillance_dset_dicts:
-            print(d)
+        #write_to_file(location_dset_output_fname, location_dset_dicts, content_type)
 
         print("<-------------------- Number of resources parsed for each dataset category -------------------->")
         print("\t", "Tycho: ", len(tycho_dset_dicts))
